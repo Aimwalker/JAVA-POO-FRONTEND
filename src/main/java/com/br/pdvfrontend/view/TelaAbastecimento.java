@@ -328,9 +328,9 @@ public class TelaAbastecimento extends JPanel {
                     if (vendaCriada != null && vendaCriada.getId() != null) {
                         JOptionPane.showMessageDialog(TelaAbastecimento.this, "Abastecimento (Venda) registrado com sucesso! ID: " + vendaCriada.getId(), "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                         
-                        // Reemitir e exibir cupom
-                        String cupomContent = HttpClient.getInstance().reemitirCupomFiscal(vendaCriada.getId());
-                        exibirCupomDialog(cupomContent);
+                        // Emitir e exibir cupom fiscal da venda original
+                        String cupomContent = HttpClient.getInstance().emitirCupomFiscal(vendaCriada.getId());
+                        exibirCupomDialog(cupomContent, "CUPOM FISCAL");
 
                         carregarBombas();
                         cmbClientes.setSelectedIndex(0);
@@ -347,24 +347,15 @@ public class TelaAbastecimento extends JPanel {
         worker.execute();
     }
 
-    private void exibirCupomDialog(String cupomContent) {
-        JDialog cupomDialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Emissão de Cupom Fiscal", Dialog.ModalityType.APPLICATION_MODAL); // Alterado o título
+    private void exibirCupomDialog(String cupomContent, String titulo) {
+        JDialog cupomDialog = new JDialog(SwingUtilities.getWindowAncestor(this), titulo, Dialog.ModalityType.APPLICATION_MODAL);
         cupomDialog.setLayout(new BorderLayout());
-        cupomDialog.setSize(400, 300);
-        cupomDialog.setLocationRelativeTo(this); // Centraliza em relação à tela principal
+        cupomDialog.setSize(400, 500);
+        cupomDialog.setLocationRelativeTo(this);
 
-        // --- DEBUG: Imprime o conteúdo original do cupom para verificar a string "Reemissão" ---
-        System.out.println("Conteúdo original do cupom fiscal: \n" + cupomContent);
-
-        // Substitui "Reemissão" por "Emissão" no conteúdo do cupom
-        String contentToDisplay = cupomContent.replace("Reemissão", "Emissão");
-        // --- DEBUG: Imprime o conteúdo modificado ---
-        System.out.println("Conteúdo modificado do cupom fiscal: \n" + contentToDisplay);
-
-
-        JTextArea textArea = new JTextArea(contentToDisplay); // Usa o conteúdo modificado
+        JTextArea textArea = new JTextArea(cupomContent);
         textArea.setEditable(false);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12)); // Fonte monoespaçada para melhor formatação de cupom
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(textArea);
 
         cupomDialog.add(scrollPane, BorderLayout.CENTER);
@@ -375,14 +366,14 @@ public class TelaAbastecimento extends JPanel {
         JButton printButton = new JButton("Imprimir");
         printButton.addActionListener(e -> {
             try {
-                textArea.print(); // Imprime o conteúdo do JTextArea
+                textArea.print();
             } catch (java.awt.print.PrinterException ex) {
                 JOptionPane.showMessageDialog(cupomDialog, "Erro ao imprimir: " + ex.getMessage(), "Erro de Impressão", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(printButton); // Adiciona o botão de impressão
+        buttonPanel.add(printButton);
         buttonPanel.add(closeButton);
         cupomDialog.add(buttonPanel, BorderLayout.SOUTH);
 

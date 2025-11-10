@@ -309,6 +309,21 @@ public class HttpClient {
         }
     }
 
+    public String emitirCupomFiscal(Long vendaId) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/vendas/" + vendaId + "/emitir-cupom"))
+                .header("Accept", "text/plain")
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            return response.body();
+        } else {
+            throw new IOException("Falha ao emitir cupom fiscal: " + response.statusCode() + " - " + response.body());
+        }
+    }
+
     public String reemitirCupomFiscal(Long vendaId) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/api/vendas/" + vendaId + "/reemitir-cupom"))

@@ -2,19 +2,19 @@ package com.br.pdvfrontend.model;
 
 import com.br.pdvfrontend.enums.FormaPagamento;
 import com.br.pdvfrontend.enums.StatusVenda;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // Importar a anotação
-import com.fasterxml.jackson.annotation.JsonProperty; // Importar esta anotação
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true) // Adicionar esta anotação
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Venda {
     private Long id;
-    // Alterar o padrão para incluir os nanossegundos
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS") // Ajustado para 6 dígitos fracionários
+
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonProperty("data")
     private LocalDateTime dataHora;
     private Long funcionarioId;
@@ -116,6 +116,8 @@ public class Venda {
     public void setStatus(StatusVenda status) {
         this.status = status;
     }
+
+
 
     public List<ItemVenda> getItens() {
         return itens;
