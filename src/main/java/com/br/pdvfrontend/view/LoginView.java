@@ -12,7 +12,7 @@ public class LoginView extends JFrame {
     private JTextField txtUsuario;
     private JPasswordField txtSenha;
     private JButton btnEntrar;
-    private JButton btnPrimeiroAcesso; // NOVO BOTÃO
+    private JButton btnRegistrar; // Renomeado para mais clareza
 
     public LoginView() {
         // Configurações básicas da janela
@@ -27,7 +27,7 @@ public class LoginView extends JFrame {
         // Componentes da tela
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(new JLabel("Usuário:"), gbc);
+        add(new JLabel("Email:"), gbc); // CORRIGIDO
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -46,37 +46,43 @@ public class LoginView extends JFrame {
         txtSenha = new JPasswordField(15);
         add(txtSenha, gbc);
 
+        // Painel para os botões
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        btnEntrar = new JButton("Entrar");
+        btnRegistrar = new JButton("Registrar-se");
+        buttonPanel.add(btnEntrar);
+        buttonPanel.add(btnRegistrar);
+
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.gridwidth = 2; // Ocupar duas colunas
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        btnEntrar = new JButton("Entrar");
-        add(btnEntrar, gbc);
+        add(buttonPanel, gbc);
 
-        // NOVO: Botão "Primeiro Acesso"
-        gbc.gridy = 3; // Uma linha abaixo do botão Entrar
-        btnPrimeiroAcesso = new JButton("Primeiro Acesso");
-        add(btnPrimeiroAcesso, gbc);
-
-        // Ação do botão
+        // Ação dos botões
         btnEntrar.addActionListener(e -> realizarLogin());
         
-        // Ação do novo botão
-        btnPrimeiroAcesso.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Funcionalidade de Primeiro Acesso (Cadastro) será implementada aqui.", "Primeiro Acesso", JOptionPane.INFORMATION_MESSAGE);
-            // TODO: Implementar navegação para a tela de cadastro de usuário
-        });
+        btnRegistrar.addActionListener(e -> abrirTelaDeRegistro());
+    }
+
+    private void abrirTelaDeRegistro() {
+        RegistroDialog dialog = new RegistroDialog(this);
+        dialog.setVisible(true);
+        // Opcional: se o registro for bem-sucedido, você pode, por exemplo,
+        // preencher o campo de email na tela de login.
+        if (dialog.isSaved()) {
+            // Lógica opcional após o registro
+        }
     }
 
     private void realizarLogin() {
         String usuario = txtUsuario.getText();
         String senha = new String(txtSenha.getPassword());
 
-        // Desabilita o botão para evitar cliques duplos
         btnEntrar.setEnabled(false);
         btnEntrar.setText("Autenticando...");
+        btnRegistrar.setEnabled(false);
 
-        // Executa a chamada de rede em uma thread separada para não travar a UI
         SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
             @Override
             protected Boolean doInBackground() throws Exception {
@@ -88,19 +94,18 @@ public class LoginView extends JFrame {
                 try {
                     boolean sucesso = get();
                     if (sucesso) {
-                        // Abre a tela principal e fecha a de login
                         new TelaPrincipal().setVisible(true);
                         dispose();
                     } else {
-                        JOptionPane.showMessageDialog(LoginView.this, "Usuário ou senha inválidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(LoginView.this, "Email ou senha inválidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(LoginView.this, "Falha na comunicação com o servidor.", "Erro de Rede", JOptionPane.ERROR_MESSAGE);
                 } finally {
-                    // Reabilita o botão
                     btnEntrar.setEnabled(true);
                     btnEntrar.setText("Entrar");
+                    btnRegistrar.setEnabled(true);
                 }
             }
         };

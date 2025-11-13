@@ -107,10 +107,10 @@ public class TelaCliente extends JPanel {
                         tableModel.addRow(new Object[]{
                                 cliente.getId(),
                                 cliente.getNomeCompleto(),
+                                cliente.getTipoPessoa(),
                                 cliente.getCpfCnpj(),
-                                cliente.getTipoPessoa(), // <-- RE-ADICIONADO
                                 cliente.getEmail(),
-                                cliente.getTelefone(),   // <-- RE-ADICIONADO
+                                cliente.getTelefone(),
                                 dataNascFormatada,
                                 limiteCreditoFormatado,
                                 saldoAtualFormatado

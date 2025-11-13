@@ -4,7 +4,7 @@ import com.br.pdvfrontend.model.Cliente;
 import com.br.pdvfrontend.util.HttpClient;
 
 import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory; // Adicionar esta importação
+import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ public class ClienteDialog extends JDialog {
 
     private JTextField txtId;
     private JTextField txtNomeCompleto;
-    private JFormattedTextField txtCpfCnpj; // Alterado para JFormattedTextField
+    private JFormattedTextField txtCpfCnpj;
     private JComboBox<String> cmbTipoPessoa;
     private JTextField txtEmail;
     private JTextField txtTelefone;
@@ -31,7 +31,6 @@ public class ClienteDialog extends JDialog {
     private Cliente cliente;
     private boolean saved = false;
 
-    // Máscaras para CPF e CNPJ
     private MaskFormatter cpfMask;
     private MaskFormatter cnpjMask;
 
@@ -43,7 +42,6 @@ public class ClienteDialog extends JDialog {
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout(10, 10));
 
-        // Inicializa as máscaras
         try {
             cpfMask = new MaskFormatter("###.###.###-##");
             cpfMask.setPlaceholderCharacter('_');
@@ -54,7 +52,6 @@ public class ClienteDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "Erro ao criar máscaras de CPF/CNPJ.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
 
-        // --- Painel do Formulário ---
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -72,15 +69,15 @@ public class ClienteDialog extends JDialog {
         gbc.gridx = 1; gbc.weightx = 1.0; txtNomeCompleto = new JTextField(); formPanel.add(txtNomeCompleto, gbc);
         row++;
 
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0; formPanel.add(new JLabel("CPF/CNPJ:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0; 
-        txtCpfCnpj = new JFormattedTextField(); // Inicializa sem máscara, será aplicada pelo listener
-        formPanel.add(txtCpfCnpj, gbc);
+        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0; formPanel.add(new JLabel("Tipo Pessoa:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0; cmbTipoPessoa = new JComboBox<>(new String[]{"FISICA", "JURIDICA"});
+        formPanel.add(cmbTipoPessoa, gbc);
         row++;
 
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0; formPanel.add(new JLabel("Tipo Pessoa:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1.0; cmbTipoPessoa = new JComboBox<>(new String[]{"FISICA", "JURIDICA"}); 
-        formPanel.add(cmbTipoPessoa, gbc);
+        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0; formPanel.add(new JLabel("CPF/CNPJ:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        txtCpfCnpj = new JFormattedTextField();
+        formPanel.add(txtCpfCnpj, gbc);
         row++;
 
         gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0; formPanel.add(new JLabel("Email:"), gbc);
@@ -112,14 +109,12 @@ public class ClienteDialog extends JDialog {
         buttonPanel.add(btnCancelar);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Listener para cmbTipoPessoa
         cmbTipoPessoa.addActionListener(e -> aplicarMascaraCpfCnpj());
 
         if (this.cliente != null) {
             preencherFormulario(this.cliente);
         } else {
-            // Garante que a máscara inicial seja aplicada para um novo cliente
-            aplicarMascaraCpfCnpj(); 
+            aplicarMascaraCpfCnpj();
         }
 
         btnSalvar.addActionListener(e -> salvarCliente());
@@ -130,13 +125,13 @@ public class ClienteDialog extends JDialog {
         String tipoPessoa = (String) cmbTipoPessoa.getSelectedItem();
         try {
             if ("FISICA".equals(tipoPessoa)) {
-                txtCpfCnpj.setFormatterFactory(new DefaultFormatterFactory(cpfMask)); // Usar DefaultFormatterFactory
+                txtCpfCnpj.setFormatterFactory(new DefaultFormatterFactory(cpfMask));
                 txtCpfCnpj.setToolTipText("Formato: XXX.XXX.XXX-XX");
             } else if ("JURIDICA".equals(tipoPessoa)) {
-                txtCpfCnpj.setFormatterFactory(new DefaultFormatterFactory(cnpjMask)); // Usar DefaultFormatterFactory
+                txtCpfCnpj.setFormatterFactory(new DefaultFormatterFactory(cnpjMask));
                 txtCpfCnpj.setToolTipText("Formato: XX.XXX.XXX/XXXX-XX");
             }
-            txtCpfCnpj.setText(""); // Limpa o texto para garantir que a nova máscara seja aplicada corretamente
+            txtCpfCnpj.setText("");
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erro ao aplicar máscara: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
@@ -146,29 +141,26 @@ public class ClienteDialog extends JDialog {
     private void preencherFormulario(Cliente c) {
         txtId.setText(String.valueOf(c.getId()));
         txtNomeCompleto.setText(c.getNomeCompleto());
-        
-        // Garante que a máscara correta seja aplicada antes de definir o texto
-        // e que o listener seja acionado para configurar o formatter factory
-        cmbTipoPessoa.setSelectedItem(c.getTipoPessoa()); 
-        // Se o cliente já tem um CPF/CNPJ, define o texto.
-        // O setFormatterFactory já foi chamado pelo listener do cmbTipoPessoa.
+
+        cmbTipoPessoa.setSelectedItem(c.getTipoPessoa());
+
         if (c.getCpfCnpj() != null && !c.getCpfCnpj().isEmpty()) {
-            txtCpfCnpj.setText(c.getCpfCnpj()); 
+            txtCpfCnpj.setText(c.getCpfCnpj());
         } else {
-            txtCpfCnpj.setText(""); // Limpa se não houver valor
+            txtCpfCnpj.setText("");
         }
-        
+
         txtEmail.setText(c.getEmail());
         txtTelefone.setText(c.getTelefone());
-        Optional.ofNullable(c.getDataNascimento()).ifPresent(data -> 
+        Optional.ofNullable(c.getDataNascimento()).ifPresent(data ->
             spnDataNascimento.setValue(Date.from(data.atStartOfDay(ZoneId.systemDefault()).toInstant()))
         );
         txtLimiteCredito.setText(Optional.ofNullable(c.getLimiteCredito()).map(BigDecimal::toString).orElse(""));
     }
 
     private void salvarCliente() {
-        String cpfCnpjRaw = txtCpfCnpj.getText().replaceAll("[^0-9]", ""); // Remove caracteres não numéricos
-        
+        String cpfCnpjRaw = txtCpfCnpj.getText().replaceAll("[^0-9]", "");
+
         if (txtNomeCompleto.getText().isBlank() || cpfCnpjRaw.isBlank()) {
             JOptionPane.showMessageDialog(this, "Nome Completo e CPF/CNPJ são obrigatórios.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
@@ -186,13 +178,13 @@ public class ClienteDialog extends JDialog {
 
         try {
             final String nomeCompleto = txtNomeCompleto.getText();
-            final String cpfCnpj = cpfCnpjRaw; // Usa o valor sem formatação
+            final String cpfCnpj = cpfCnpjRaw;
             final String email = txtEmail.getText();
             final String telefone = txtTelefone.getText();
-            
+
             final Date dataSelecionada = (Date) spnDataNascimento.getValue();
             final LocalDate dataNascimento = dataSelecionada.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            
+
             BigDecimal tempLimiteCredito = BigDecimal.ZERO;
             if (!txtLimiteCredito.getText().isBlank()) {
                 tempLimiteCredito = new BigDecimal(txtLimiteCredito.getText().replace(",", "."));

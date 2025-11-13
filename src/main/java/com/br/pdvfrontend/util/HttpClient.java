@@ -67,6 +67,26 @@ public class HttpClient {
         return false;
     }
 
+    public boolean registrarNovoUsuario(String nome, String email, String senha, String cpfCnpj, String dataNascimento, String tipoPessoa) throws IOException, InterruptedException {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("nomeCompleto", nome);
+        requestBody.put("email", email);
+        requestBody.put("senha", senha);
+        requestBody.put("cpfCnpj", cpfCnpj);
+        requestBody.put("dataNascimento", dataNascimento);
+        requestBody.put("tipoPessoa", tipoPessoa);
+        String jsonBody = objectMapper.writeValueAsString(requestBody);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/funcionarios/registrar"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+        
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.statusCode() == 201;
+    }
+
     // --- Métodos de Produto ---
     public List<Produto> buscarProdutos() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/produtos")).header("Accept", "application/json").GET().build();

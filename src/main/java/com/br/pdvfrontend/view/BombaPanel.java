@@ -16,7 +16,7 @@ public class BombaPanel extends JPanel {
     private JLabel lblCombustivel;
     private JLabel lblStatus;
     private JLabel lblTanqueId;
-    private JLabel lblBicoInfo; // <-- NOVO CAMPO PARA EXIBIR BICO E COMBUSTÍVEL
+    private JLabel lblBicoInfo;
 
     public BombaPanel(Bomba bomba, Produto combustivelProduto) {
         // Layout com 3 linhas: Bico/Combustível, Tanque, Status
@@ -38,21 +38,21 @@ public class BombaPanel extends JPanel {
         lblTanqueId.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblTanqueId.setHorizontalAlignment(SwingConstants.CENTER);
 
-        lblStatus = new JLabel(bomba.getStatus().name()); // <-- USANDO ENUM.name()
+        lblStatus = new JLabel(bomba.getStatus().name());
         lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblStatus.setHorizontalAlignment(SwingConstants.CENTER);
 
-        add(lblBicoInfo); // <-- ADICIONADO
+        add(lblBicoInfo);
         add(lblTanqueId);
         add(lblStatus);
 
-        updateStatusColor(bomba.getStatus()); // <-- USANDO ENUM
+        updateStatusColor(bomba.getStatus());
     }
 
-    private void updateStatusColor(StatusBomba status) { // <-- MÉTODO ATUALIZADO PARA ENUM
+    private void updateStatusColor(StatusBomba status) {
         Color backgroundColor;
         
-        switch (status) { // <-- USANDO ENUM
+        switch (status) {
             case ATIVA:
                 backgroundColor = new Color(204, 255, 204); // Verde claro
                 break;
